@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Core/">
+    <Project Path="EducationPlatform.Application/EducationPlatform.Application.csproj" Id="27365a8e-2714-4bf3-8a0c-d5975ba14b25" />
+    <Project Path="EducationPlatform.Domain/EducationPlatform.Domain.csproj" Id="a4d2cfcf-b5a8-488c-b6df-9d3a75acb5bc" />
+  </Folder>
+  <Folder Name="/Infrastructure/">
+    <Project Path="EducationPlatform.Infrastructure/EducationPlatform.Infrastructure.csproj" Id="44ba68ac-2f2e-425d-a0fa-d9ed53e1e3d2" />
+  </Folder>
+  <Folder Name="/Presentation/">
+    <Project Path="EducationPlatform.API/EducationPlatform.API.csproj" Id="84d42802-333a-44b8-857e-6920c84720cc" />
+  </Folder>
+</Solution>
