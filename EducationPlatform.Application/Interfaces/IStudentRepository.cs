@@ -1,4 +1,5 @@
-﻿using EducationPlatform.Domain.Entities;
+﻿using EducationPlatform.Application.DTOs;
+using EducationPlatform.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,15 +1,18 @@
-﻿using EducationPlatform.Application.Interfaces;
+﻿using EducationPlatform.Application.DTOs;
+using EducationPlatform.Application.Interfaces;
 using EducationPlatform.Domain.Entities;
 using EducationPlatform.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace EducationPlatform.Infrastructure.Persistence
 {
+  
     public class StudentRepository : IStudentRepository
     {
         private readonly AppDbContext context;
@@ -36,11 +39,13 @@ namespace EducationPlatform.Infrastructure.Persistence
             return await context.Students.ToListAsync();
         }
 
-        public async Task<Student> GetStudentByIdAsync(int id)
+       public async Task<Student> GetStudentByIdAsync(int id)
         {
-            var student = await context.Students.FirstOrDefaultAsync(s => s.Id == id);
+            var student = context.Students.FirstOrDefault(x => x.Id == id);
+
             return student;
         }
+
 
         public async Task UpdateStudentAsync(Student student)
         {
@@ -51,7 +56,7 @@ namespace EducationPlatform.Infrastructure.Persistence
         public async Task<float> GetAvgStudentsAsync()
         {
             var result = await context.Students.AverageAsync(x => (float?)x.Grade);
-            return result != null ? (float)result : 0;
+            return result != null ? (float) result : 0;
         }
 
         public async Task<IEnumerable<Student>> GetStudentsPassed()

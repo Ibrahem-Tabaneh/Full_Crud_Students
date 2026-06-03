@@ -16,7 +16,11 @@ namespace EducationPlatform.Domain.Entities
         public int Age { get; set; }
         public int Grade { get; set; }
         public string? ImgPath { get; set; }
-     
+        public string Role { get; set; } = "student";
+        public string? RefreshTokenHash { get; set; }
+        public DateTime? RefreshTokenExpiresAt { get; set; }
+        public DateTime? RefreshTokenRevokedAt { get; set; }
+
 
     }
 }

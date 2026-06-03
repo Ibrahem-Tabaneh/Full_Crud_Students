@@ -1,12 +1,17 @@
 ﻿using AutoMapper;
+using EducationPlatform.API.Helpers;
 using EducationPlatform.Application.DTOs;
 using EducationPlatform.Application.Interfaces;
 using EducationPlatform.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace EducationPlatform.API.Controllers
 {
+    [Authorize]
     [Route("api/Students")]
     [ApiController]
     public class StudentsController : ControllerBase
@@ -22,8 +27,13 @@ namespace EducationPlatform.API.Controllers
             this.mapper = mapper;
         }
 
+        [Authorize(Roles = "admin")]
         [HttpGet(Name = "getAllStudent")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+
+
         public async Task<ActionResult<IEnumerable<StudentDTO>>> GetAllStudentsAsync()
         {
             var listStudent = await studentRepository.GetAllStudentsAsync();
@@ -31,6 +41,18 @@ namespace EducationPlatform.API.Controllers
             return Ok(listStudentDTO);
         }
 
+        [AllowAnonymous]
+        [HttpGet("getStudentsAvg")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+
+        public async Task<ActionResult> getStudentsAvg()
+        {
+            var avg = await studentRepository.GetAvgStudentsAsync();
+            return Ok(avg);
+        }
+
+
+        [AllowAnonymous]
         [HttpGet("getPassedStudent", Name = "getPassedStudent")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<StudentDTO>>> GetPassedStudent()
@@ -39,7 +61,8 @@ namespace EducationPlatform.API.Controllers
             var studentsPassedDTO = mapper.Map<List<StudentDTO>>(studentsPassed);
             return Ok(studentsPassedDTO);
         }
-
+        
+        [AllowAnonymous]
         [HttpGet("getFailedStudent", Name = "getFailedStudent")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<StudentDTO>>> GetFailedStudent()
@@ -53,18 +76,24 @@ namespace EducationPlatform.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+
         public async Task<ActionResult<StudentDTO>> GetStudentByIdAsync(int id)
         {
             if (id <= 0) return BadRequest("invalid id.");
 
             var student = await studentRepository.GetStudentByIdAsync(id);
-            if (student == null) return NotFound("student not found.");
+            if (student == null) return NotFound();
+
+            if(!User.IsOwnerOrAdmin(id)) return Forbid();
 
             var studentDTO = mapper.Map<StudentDTO>(student);
-
             return Ok(studentDTO);
         }
 
+        //[Authorize(Roles = "admin")]
+        [AllowAnonymous]
         [HttpPost("addStudent", Name = "addStudent")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -83,10 +112,14 @@ namespace EducationPlatform.API.Controllers
 
             return CreatedAtRoute("getStudentById", new { id = newStudent.Id }, newStudentDTO);
         }
+
+        [Authorize(Roles = "admin")]
         [HttpPut("updateStudent", Name = "updateStudent")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult> UpdateStudentAsync( [FromForm] UpdateStudentDTO studentDTO)
         {
             if (studentDTO.Id <= 0) return BadRequest("Mismatched ID");
@@ -115,10 +148,13 @@ namespace EducationPlatform.API.Controllers
 
         }
 
+        [Authorize(Roles = "admin")]
         [HttpDelete("deleteStudent/{id}", Name = "deleteStudent")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult> DeleteStudent(int id)
         {
             if (id <= 0) return BadRequest("invalid id.");
